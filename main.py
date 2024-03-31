@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import scrolledtext, ttk, Listbox, simpledialog, StringVar, messagebox
+from tkinter import scrolledtext, ttk, Listbox, simpledialog, StringVar, messagebox, colorchooser
 from collections import Counter
 import re
 import pyperclip
@@ -51,41 +51,32 @@ def display_frequencies():
     stats_display.insert(tk.END, stats_text)
 
 def on_word_select(event):
-    # Get the list of currently selected items
     selected_indices = word_list.curselection()
+    selected_color = highlight_color_var.get()  # Get the selected color
     
-    # Check if there is at least one item selected and the selection is valid
-    if selected_indices:
-        selected_index = selected_indices[0]  # Get the first selected item
+    # Clear existing highlights
+    for tag in text_input.tag_names():
+        text_input.tag_delete(tag)
+    
+    for index in selected_indices:
         try:
-            # Attempt to retrieve the selected item's text
-            selected_text = word_list.get(selected_index)
-            # Split the text to extract the word part before the colon
+            selected_text = word_list.get(index)
             word = selected_text.split(":")[0]
-            # Call the function to highlight the word in the text input area
-            highlight_word(word)
+            highlight_word(word, selected_color)
         except tk.TclError as e:
             print(f"Error accessing Listbox item: {e}")
-    else:
-        # If no item is selected, or the selection is invalid, do nothing or handle as needed
-        print("No item selected or invalid selection")
 
-def highlight_word(word):
-    # Clear existing tags
-    text_input.tag_remove('highlight', '1.0', tk.END)
-    
-    if not word:
-        return
-    
+def highlight_word(word, color):
     start_pos = '1.0'
     while True:
         start_pos = text_input.search(word, start_pos, stopindex=tk.END)
         if not start_pos:
             break
         end_pos = f"{start_pos}+{len(word)}c"
-        text_input.tag_add('highlight', start_pos, end_pos)
+        tag_name = f"highlight_{word}"
+        text_input.tag_add(tag_name, start_pos, end_pos)
+        text_input.tag_config(tag_name, background=color)
         start_pos = end_pos
-    text_input.tag_config('highlight', background='yellow')
 
 def plot_frequencies():
     x = simpledialog.askinteger("Input", "How many top words to display?", minvalue=1, maxvalue=100)
@@ -136,6 +127,9 @@ text_input_label.pack(pady=(10,0))
 text_input = scrolledtext.ScrolledText(root, height=10, font=('Helvetica', 12), bg='white', fg='black')
 text_input.pack(pady=(0,10))
 
+# Set focus to the text_input widget to show the blinking cursor
+text_input.focus_set()
+
 exclude_label = ttk.Label(root, text="Words to exclude (comma-separated):")
 exclude_label.pack()
 exclude_entry = ttk.Entry(root)
@@ -153,7 +147,7 @@ plot_button.pack(pady=(5,10))
 
 word_list_label = ttk.Label(root, text="Click a word to highlight:")
 word_list_label.pack(pady=(10,0))
-word_list = Listbox(root, height=10)
+word_list = Listbox(root, height=10, selectmode=tk.MULTIPLE)
 word_list.pack(pady=(0,10))
 word_list.bind('<<ListboxSelect>>', on_word_select)
 
