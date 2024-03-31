@@ -5,6 +5,7 @@ import re
 import pyperclip
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from ttkthemes import ThemedTk
 
 # Define the common words
 top_50_words = set("the, of, and, a, to, in, is, you, that, it, he, for, was, on, are, as, not, but, what, all, were, when, we, there, can, an, your, which, their, said, if, do, into, has, more, her, two, like, him, see, time, could, no, make, than, first, been, its, water, long".split(", "))
@@ -61,16 +62,13 @@ def on_word_select(event):
     for tag in text_input.tag_names():
         text_input.tag_delete(tag)
     
-    if selected_indices:
-        for index in selected_indices:
-            try:
-                selected_text = word_list.get(index)
-                word = selected_text.split(":")[0]
-                highlight_word(word, selected_color)
-            except tk.TclError as e:
-                print(f"Error accessing Listbox item: {e}")
-    else:
-        print("No item selected or invalid selection")
+    for index in selected_indices:
+        try:
+            selected_text = word_list.get(index)
+            word = selected_text.split(":")[0]
+            highlight_word(word, selected_color)
+        except tk.TclError as e:
+            print(f"Error accessing Listbox item: {e}")
 
 def highlight_word(word, color):
     start_pos = '1.0'
@@ -124,22 +122,36 @@ def copy_to_clipboard():
     messagebox.showinfo("Copied", "Words and frequencies copied to clipboard!")
 
 # Set up the GUI
-root = tk.Tk()
+root = ThemedTk(theme="equilux")
 root.title("Word Frequency Counter")
 root.geometry("800x900")  # Adjusted to accommodate the new stats area and plotting area
 
-text_input_label = ttk.Label(root, text="Enter your text below:")
+# Use a modern and consistent font
+modern_font = ('Arial', 10, 'bold')  # Making the font bold for better readability
+
+# Use a higher contrast color scheme
+bg_color = '#ffffff'  # White background for higher contrast
+text_color = '#000000'  # Black text for better readability
+button_color = '#f2f2f2'  # Light grey for buttons
+highlight_color = '#cce7ff'  # Light blue highlight color
+
+root.configure(bg=bg_color)  # Set the background color for the root window
+
+# Apply the modern font and higher contrast color scheme to labels
+text_input_label = ttk.Label(root, text="Enter your text below:", font=modern_font, background=bg_color, foreground=text_color)
 text_input_label.pack(pady=(10,0))
-text_input = scrolledtext.ScrolledText(root, height=10, font=('Helvetica', 12), bg='white', fg='black')
-text_input.pack(pady=(0,10))
+
+# Apply the modern font and color scheme to the text input
+text_input = scrolledtext.ScrolledText(root, height=10, font=('Helvetica', 12), bg='white', fg=text_color)
+text_input.pack(pady=(0,10), padx=10)
 
 # Set focus to the text_input widget to show the blinking cursor
 text_input.focus_set()
 
-exclude_label = ttk.Label(root, text="Words to exclude (comma-separated):")
+exclude_label = ttk.Label(root, text="Words to exclude (comma-separated):", font=modern_font, background=bg_color, foreground=text_color)
 exclude_label.pack()
 # Create a Text widget for words to exclude
-exclude_text = tk.Text(root, height=1, width=40, wrap="none")  # Set wrap to "none" for horizontal scrolling
+exclude_text = tk.Text(root, height=1, width=40, wrap="none", font=modern_font)  # Set wrap to "none" for horizontal scrolling
 exclude_text.pack()
 
 # Create a horizontal scrollbar and attach it to the exclude_text widget
@@ -148,31 +160,31 @@ hscroll.pack(fill="x")
 exclude_text.config(xscrollcommand=hscroll.set)
 
 sort_var = tk.BooleanVar()
-sort_check = ttk.Checkbutton(root, text="Sort by least frequent", variable=sort_var)
+sort_check = ttk.Checkbutton(root, text="Sort by least frequent", variable=sort_var, style='TCheckbutton')
 sort_check.pack()
 
-count_button = ttk.Button(root, text="Count Word Frequencies", command=display_frequencies)
-count_button.pack(pady=(10,0))
+count_button = ttk.Button(root, text="Count Word Frequencies", command=display_frequencies, style='TButton')
+count_button.pack(pady=(10,0), padx=10)
 
-plot_button = ttk.Button(root, text="Plot Top Word Frequencies", command=plot_frequencies)
-plot_button.pack(pady=(5,10))
+plot_button = ttk.Button(root, text="Plot Top Word Frequencies", command=plot_frequencies, style='TButton')
+plot_button.pack(pady=(5,10), padx=10)
 
-word_list_label = ttk.Label(root, text="Click a word to highlight:")
+word_list_label = ttk.Label(root, text="Click a word to highlight:", font=modern_font, background=bg_color, foreground=text_color)
 word_list_label.pack(pady=(10,0))
-word_list = Listbox(root, height=10, selectmode=tk.MULTIPLE)
-word_list.pack(pady=(0,10))
+word_list = Listbox(root, height=10, selectmode=tk.MULTIPLE, bg='white', fg=text_color)
+word_list.pack(pady=(0,10), padx=10)
 word_list.bind('<<ListboxSelect>>', on_word_select)
 
 # New stats display area
-stats_display_label = ttk.Label(root, text="Text Statistics:")
+stats_display_label = ttk.Label(root, text="Text Statistics:", font=modern_font, background=bg_color, foreground=text_color)
 stats_display_label.pack(pady=(10,0))
 stats_display = scrolledtext.ScrolledText(root, height=5, font=('Helvetica', 10), bg='white', fg='black')
-stats_display.pack(pady=(0,10))
+stats_display.pack(pady=(0,10), padx=10)
 
 # Dropdown for common words selection
 common_words_var = StringVar()
 common_words_var.set("None")  # default value
-common_words_label = ttk.Label(root, text="Exclude common words:")
+common_words_label = ttk.Label(root, text="Exclude common words:", font=modern_font, background=bg_color, foreground=text_color)
 common_words_label.pack()
 common_words_dropdown = ttk.OptionMenu(root, common_words_var, "None", "Top 50", "Top 100", "Top 150")
 common_words_dropdown.pack()
@@ -182,13 +194,20 @@ highlight_colors = ["yellow", "light green", "light blue", "pink", "orange"]
 highlight_color_var = StringVar()
 highlight_color_var.set(highlight_colors[0])  # default to the first color
 
-highlight_color_label = ttk.Label(root, text="Select highlight color:")
+highlight_color_label = ttk.Label(root, text="Select highlight color:", font=modern_font, background=bg_color, foreground=text_color)
 highlight_color_label.pack()
 highlight_color_dropdown = ttk.OptionMenu(root, highlight_color_var, *highlight_colors)
 highlight_color_dropdown.pack()
 
 # Copy to Clipboard button
-copy_button = ttk.Button(root, text="Copy to Clipboard", command=copy_to_clipboard)
-copy_button.pack(pady=(5,10))
+copy_button = ttk.Button(root, text="Copy to Clipboard", command=copy_to_clipboard, style='TButton')
+copy_button.pack(pady=(5,10), padx=10)
+
+# Customize ttk widgets using a style
+style = ttk.Style()
+style.configure('TButton', font=modern_font, background=button_color, relief='flat')
+style.configure('TLabel', font=modern_font, background=bg_color, foreground=text_color)
+style.configure('TCheckbutton', font=modern_font, background=bg_color, foreground=text_color)
+style.map('TCheckbutton', background=[('active', highlight_color)])
 
 root.mainloop()
