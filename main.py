@@ -51,12 +51,24 @@ def display_frequencies():
     stats_display.insert(tk.END, stats_text)
 
 def on_word_select(event):
+    # Get the list of currently selected items
     selected_indices = word_list.curselection()
-    if not selected_indices:  # Check if the selection is empty
-        return  # Exit the function if there's no selection
-    selected_index = selected_indices[0]
-    selected_text = word_list.get(selected_index).split(":")[0]
-    highlight_word(selected_text)
+    
+    # Check if there is at least one item selected and the selection is valid
+    if selected_indices:
+        selected_index = selected_indices[0]  # Get the first selected item
+        try:
+            # Attempt to retrieve the selected item's text
+            selected_text = word_list.get(selected_index)
+            # Split the text to extract the word part before the colon
+            word = selected_text.split(":")[0]
+            # Call the function to highlight the word in the text input area
+            highlight_word(word)
+        except tk.TclError as e:
+            print(f"Error accessing Listbox item: {e}")
+    else:
+        # If no item is selected, or the selection is invalid, do nothing or handle as needed
+        print("No item selected or invalid selection")
 
 def highlight_word(word):
     # Clear existing tags
