@@ -18,7 +18,7 @@ def count_word_frequency(text, exclude_words):
 
 def display_frequencies():
     text = text_input.get("1.0", tk.END)
-    exclude_words_input = exclude_entry.get().lower().split(',')
+    exclude_words_input = exclude_text.get("1.0", "end-1c").lower().split(',')
     exclude_words = set(word.strip() for word in exclude_words_input)
     
     # Append common words based on user selection
@@ -53,18 +53,24 @@ def display_frequencies():
 def on_word_select(event):
     selected_indices = word_list.curselection()
     selected_color = highlight_color_var.get()  # Get the selected color
-    
+    if not selected_indices:
+        print("No item selected or invalid selection")
+        return  # Exit the function if no selection is made
+
     # Clear existing highlights
     for tag in text_input.tag_names():
         text_input.tag_delete(tag)
     
-    for index in selected_indices:
-        try:
-            selected_text = word_list.get(index)
-            word = selected_text.split(":")[0]
-            highlight_word(word, selected_color)
-        except tk.TclError as e:
-            print(f"Error accessing Listbox item: {e}")
+    if selected_indices:
+        for index in selected_indices:
+            try:
+                selected_text = word_list.get(index)
+                word = selected_text.split(":")[0]
+                highlight_word(word, selected_color)
+            except tk.TclError as e:
+                print(f"Error accessing Listbox item: {e}")
+    else:
+        print("No item selected or invalid selection")
 
 def highlight_word(word, color):
     start_pos = '1.0'
@@ -84,7 +90,7 @@ def plot_frequencies():
         return  # User cancelled or entered an invalid number
     
     text = text_input.get("1.0", tk.END)
-    exclude_words = exclude_entry.get().lower().split(',')
+    exclude_words = exclude_text.get("1.0", "end-1c").lower().split(',')
     exclude_words = [word.strip() for word in exclude_words]
     word_frequencies = count_word_frequency(text, exclude_words)
     
@@ -132,8 +138,14 @@ text_input.focus_set()
 
 exclude_label = ttk.Label(root, text="Words to exclude (comma-separated):")
 exclude_label.pack()
-exclude_entry = ttk.Entry(root)
-exclude_entry.pack()
+# Create a Text widget for words to exclude
+exclude_text = tk.Text(root, height=1, width=40, wrap="none")  # Set wrap to "none" for horizontal scrolling
+exclude_text.pack()
+
+# Create a horizontal scrollbar and attach it to the exclude_text widget
+hscroll = tk.Scrollbar(root, orient="horizontal", command=exclude_text.xview)
+hscroll.pack(fill="x")
+exclude_text.config(xscrollcommand=hscroll.set)
 
 sort_var = tk.BooleanVar()
 sort_check = ttk.Checkbutton(root, text="Sort by least frequent", variable=sort_var)
@@ -164,6 +176,16 @@ common_words_label = ttk.Label(root, text="Exclude common words:")
 common_words_label.pack()
 common_words_dropdown = ttk.OptionMenu(root, common_words_var, "None", "Top 50", "Top 100", "Top 150")
 common_words_dropdown.pack()
+
+# Define available highlight colors
+highlight_colors = ["yellow", "light green", "light blue", "pink", "orange"]
+highlight_color_var = StringVar()
+highlight_color_var.set(highlight_colors[0])  # default to the first color
+
+highlight_color_label = ttk.Label(root, text="Select highlight color:")
+highlight_color_label.pack()
+highlight_color_dropdown = ttk.OptionMenu(root, highlight_color_var, *highlight_colors)
+highlight_color_dropdown.pack()
 
 # Copy to Clipboard button
 copy_button = ttk.Button(root, text="Copy to Clipboard", command=copy_to_clipboard)
