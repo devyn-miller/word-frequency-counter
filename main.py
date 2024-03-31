@@ -14,11 +14,24 @@ def display_frequencies():
     exclude_words = [word.strip() for word in exclude_words]
     word_frequencies = count_word_frequency(text, exclude_words)
     
-    # Clear the listbox before adding new items
+    # Clear the listbox and stats display before adding new items
     word_list.delete(0, tk.END)
+    stats_display.delete("1.0", tk.END)
     
     for word, freq in word_frequencies.items():
         word_list.insert(tk.END, f"{word}: {freq}")
+    
+    total_diff_words = len(word_frequencies)
+    word_count = sum(word_frequencies.values())
+    char_count_incl_spaces = len(text) - 1  # Subtract 1 to exclude the final newline character
+    char_count_excl_spaces = len(text.replace(" ", "").replace("\n", ""))
+    
+    stats_text = f"Total different words: {total_diff_words}\n"
+    stats_text += f"Total words: {word_count}\n"
+    stats_text += f"Characters (including spaces): {char_count_incl_spaces}\n"
+    stats_text += f"Characters (excluding spaces): {char_count_excl_spaces}\n"
+    
+    stats_display.insert(tk.END, stats_text)
 
 def on_word_select(event):
     selected_index = word_list.curselection()
@@ -45,7 +58,7 @@ def highlight_word(word):
 # Set up the GUI
 root = tk.Tk()
 root.title("Word Frequency Counter")
-root.geometry("600x600")
+root.geometry("600x700")  # Adjusted to accommodate the new stats area
 
 text_input_label = ttk.Label(root, text="Enter your text below:")
 text_input_label.pack(pady=(10,0))
@@ -65,5 +78,11 @@ word_list_label.pack(pady=(10,0))
 word_list = Listbox(root, height=10)
 word_list.pack(pady=(0,10))
 word_list.bind('<<ListboxSelect>>', on_word_select)
+
+# New stats display area
+stats_display_label = ttk.Label(root, text="Text Statistics:")
+stats_display_label.pack(pady=(10,0))
+stats_display = scrolledtext.ScrolledText(root, height=5, font=('Helvetica', 10), bg='white', fg='black')
+stats_display.pack(pady=(0,10))
 
 root.mainloop()
