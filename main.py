@@ -31,6 +31,10 @@ def display_frequencies():
     elif common_words_selection == "Top 150":
         exclude_words.update(top_150_words)
     
+    # Update the exclude_text widget with the new exclude words
+    exclude_text.delete("1.0", tk.END)
+    exclude_text.insert("1.0", ', '.join(exclude_words))
+    
     word_frequencies = count_word_frequency(text, exclude_words)
     
     word_list.delete(0, tk.END)
@@ -186,7 +190,10 @@ common_words_var = StringVar()
 common_words_var.set("None")  # default value
 common_words_label = ttk.Label(root, text="Exclude common words:", font=modern_font, background=bg_color, foreground=text_color)
 common_words_label.pack()
-common_words_dropdown = ttk.OptionMenu(root, common_words_var, "None", "Top 50", "Top 100", "Top 150")
+# Ensure the update_exclude_words_list function is defined before using it as a command
+def update_exclude_words_list(selection):
+    print(f"Excluding: {selection}")  # Placeholder function body
+common_words_dropdown = ttk.OptionMenu(root, common_words_var, "None", "Top 50", "Top 100", "Top 150", command=update_exclude_words_list)
 common_words_dropdown.pack()
 
 # Define available highlight colors
