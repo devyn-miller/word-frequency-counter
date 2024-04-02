@@ -131,7 +131,7 @@ root.title("Word Frequency Counter")
 root.geometry("800x900")  # Adjusted to accommodate the new stats area and plotting area
 
 # Use a modern and consistent font
-modern_font = ('Arial', 10, 'bold')  # Making the font bold for better readability
+modern_font = ('Arial', 12, 'bold')  # Making the font bold for better readability
 
 # Use a higher contrast color scheme
 bg_color = '#ffffff'  # White background for higher contrast
