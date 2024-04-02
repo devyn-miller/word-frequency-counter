@@ -141,8 +141,22 @@ highlight_color = '#cce7ff'  # Light blue highlight color
 
 root.configure(bg=bg_color)  # Set the background color for the root window
 
+# Welcome message box
+def show_welcome_message():
+    messagebox.showinfo("Welcome", "Welcome to the Word Frequency Counter!\n\n"
+                                    "1. Enter your text in the provided text area.\n"
+                                    "2. Optionally, specify words to exclude.\n"
+                                    "3. Use the 'Count Word Frequencies' button to see the frequencies of each word.\n"
+                                    "4. Highlight words by clicking on them in the list.\n"
+                                    "5. Use the 'Plot Top Word Frequencies' to visualize the data.\n"
+                                    "6. 'Copy to Clipboard' allows you to copy the list of words and their frequencies.\n\n"
+                                    "Enjoy analyzing your text!")
+
+# Call the welcome message function after the main window is set up
+root.after(100, show_welcome_message)
+
 # Apply the modern font and higher contrast color scheme to labels
-text_input_label = ttk.Label(root, text="Enter your text below:", font=modern_font, background=bg_color, foreground=text_color)
+text_input_label = ttk.Label(root, text="Enter your text below (Paste your text here to analyze word frequencies):", font=modern_font, background=bg_color, foreground=text_color)
 text_input_label.pack(pady=(10,0))
 
 # Apply the modern font and color scheme to the text input
@@ -152,7 +166,7 @@ text_input.pack(pady=(0,10), padx=10)
 # Set focus to the text_input widget to show the blinking cursor
 text_input.focus_set()
 
-exclude_label = ttk.Label(root, text="Words to exclude (comma-separated):", font=modern_font, background=bg_color, foreground=text_color)
+exclude_label = ttk.Label(root, text="Words to exclude (comma-separated, e.g., 'and, the, a'):", font=modern_font, background=bg_color, foreground=text_color)
 exclude_label.pack()
 # Create a Text widget for words to exclude
 exclude_text = tk.Text(root, height=1, width=40, wrap="none", font=modern_font)  # Set wrap to "none" for horizontal scrolling
@@ -188,7 +202,7 @@ stats_display.pack(pady=(0,10), padx=10)
 # Dropdown for common words selection
 common_words_var = StringVar()
 common_words_var.set("None")  # default value
-common_words_label = ttk.Label(root, text="Exclude common words:", font=modern_font, background=bg_color, foreground=text_color)
+common_words_label = ttk.Label(root, text="Exclude common words: Select a preset list of common words to exclude from the analysis.", font=modern_font, background=bg_color, foreground=text_color)
 common_words_label.pack()
 # Ensure the update_exclude_words_list function is defined before using it as a command
 def update_exclude_words_list(selection):
